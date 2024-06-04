@@ -1,22 +1,18 @@
+import "dotenv/config";
 import getConnection from "./conn.js";
 
-const DATABASE = "componentes-ort";
-const CATEGORIAS = "categorias";
+const DATABASE = process.env.DATABASE || "componentes-ort";
+const CATEGORIAS = process.env.CATEGORIAS || "categorias";
 
-const getConnectionClient = async () => {
+const getClient = async () => {
     const connectiondb = await getConnection();
-    const categorias = await connectiondb
-        .db(DATABASE)
-        .collection(CATEGORIAS);
-
-    return categorias;
+    const client = await connectiondb.db(DATABASE).collection(CATEGORIAS);
+    return client;
 };
 
 export const getAllProducts = async () => {
-    const client = await getConnectionClient()
-    const categorias = client
-        .find({})
-        .toArray();
+    const client = await getClient();
+    const categorias = await client.find().toArray();
 
     return categorias;
 };
