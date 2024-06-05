@@ -1,28 +1,97 @@
 import express from "express";
-import { createCategoria } from "../../data/categorias/categorias.js";
+import {
+  createCategoria,
+  deleteCategoria,
+  editCategoria,
+  getCategoriaById,
+  getCategorias,
+} from "../../data/categorias/categorias.js";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.send("funcionando...");
-});
 
 //debe recibir un objeto categoria --> {nombre: "nombre categoria"}
 router.post("/createCategoria", async (req, res) => {
   try {
     const result = await createCategoria(req.body);
+    if (result instanceof Error) {
+      return res.status(400).send(result);
+    }
     res.status(201).send(result);
   } catch (error) {
-    res.status(400).send({ error: error.message });
+    res.status(500).send(error);
   }
 });
 
-router.get("/getCategorias", async (req, res) => {});
+//obtiene todas las categorias
+router.get("/getCategorias", async (req, res) => {
+  try {
+    const result = await getCategorias();
+    if (result.length === 0)
+      return res.status(404).send("No hay categorias para devolver");
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
-router.get("/getCategorias/:id", async (req, res) => {});
+//obtiene una categoria que coincida con el id enviado por url param
+router.get("/getCategorias/:id", async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).send("ID inválido");
+  }
 
-router.put("/editCategoria", (req, res) => {});
+  try {
+    const result = await getCategoriaById(req.params.id);
 
-router.delete("deleteCategoria/:id", (req, res) => {});
+    if (!result)
+      return res
+        .status(404)
+        .send(`Categoría (id: ${req.body._id}) no encontrada`);
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//en el body se debe enviar el objeto editado
+router.put("/editCategoria", async (req, res) => {
+  if (!ObjectId.isValid(req.body._id)) {
+    return res.status(400).send("ID inválido");
+  }
+
+  try {
+    const result = await editCategoria(req.body);
+
+    if (result.matchedCount === 0) {
+      return res
+        .status(404)
+        .send(`Categoría (id: ${req.body._id}) no encontrada`);
+    }
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete("/deleteCategoria/:id", async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).send("ID inválido");
+  }
+
+  try {
+    const result = await deleteCategoria(req.params.id);
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .send(`Categoría (id: ${req.body._id}) no encontrada`);
+    }
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 export default router;
