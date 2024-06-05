@@ -10,6 +10,12 @@ import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
+//funcion para generar un objeto para ser retornado en create, edit y delete. Informando un mensaje y el resultado
+const generateResult = (message, result) => ({
+  message: message,
+  result: result,
+});
+
 //debe recibir un objeto categoria --> {nombre: "nombre categoria"}
 router.post("/createCategoria", async (req, res) => {
   try {
@@ -17,7 +23,9 @@ router.post("/createCategoria", async (req, res) => {
     if (result instanceof Error) {
       return res.status(400).send(result);
     }
-    res.status(201).send(result);
+    res
+      .status(201)
+      .send(generateResult(`Se agrego la categoría exitosamente`, result));
   } catch (error) {
     res.status(500).send(error);
   }
@@ -47,7 +55,7 @@ router.get("/getCategorias/:id", async (req, res) => {
     if (!result)
       return res
         .status(404)
-        .send(`Categoría (id: ${req.body._id}) no encontrada`);
+        .send(`Categoría (id: ${req.params.id}) no encontrada`);
 
     res.status(200).send(result);
   } catch (error) {
@@ -70,7 +78,9 @@ router.put("/editCategoria", async (req, res) => {
         .send(`Categoría (id: ${req.body._id}) no encontrada`);
     }
 
-    res.status(200).send(result);
+    res
+      .status(200)
+      .json(generateResult(`Se editó la categoría exitosamente`, result));
   } catch (error) {
     res.status(500).send(error);
   }
@@ -86,9 +96,11 @@ router.delete("/deleteCategoria/:id", async (req, res) => {
     if (result.deletedCount === 0) {
       return res
         .status(404)
-        .send(`Categoría (id: ${req.body._id}) no encontrada`);
+        .send(`Categoría (id: ${req.params.id}) no encontrada`);
     }
-    res.status(200).send(result);
+    res
+      .status(200)
+      .send(generateResult(`Se eliminó la categoría exitosamente`, result));
   } catch (error) {
     res.status(500).send(error);
   }
