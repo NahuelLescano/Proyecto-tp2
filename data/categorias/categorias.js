@@ -6,9 +6,14 @@ const ERROR_INSERTAR = "Error al insertar la categoría: ";
 
 //obtiene el la base la coleccion categorias de la base de datos
 async function getCliente() {
-  const conndb = await getConnection();
-  const cliente = await conndb.db(DATABASE).collection(CATEGORIAS);
-  return cliente;
+  try {
+    const conndb = await getConnection();
+    const cliente = await conndb.db(DATABASE).collection(CATEGORIAS);
+    return cliente;
+  } catch (error) {
+    console.error("Error al obtener la colección de categorías:", error);
+    throw error;
+  }
 }
 
 //valida que el objeto categoria tenga .nombre
@@ -24,7 +29,8 @@ async function getCategoria(nombreCat) {
 
     return result;
   } catch (error) {
-    return new Error(ERROR_INSERTAR + error.message);
+    console.error(ERROR_INSERTAR, error);
+    throw error;
   }
 }
 

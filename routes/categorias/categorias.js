@@ -17,4 +17,12 @@ router.post("/createCategoria", async (req, res) => {
   }
 });
 
+router.get("/getCategorias", async (req, res) => {});
+
+router.get("/getCategorias/:id", async (req, res) => {});
+
+router.put("/editCategoria", (req, res) => {});
+
+router.delete("deleteCategoria/:id", (req, res) => {});
+
 export default router;
