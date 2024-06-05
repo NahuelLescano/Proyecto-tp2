@@ -5,18 +5,18 @@ import {
   editCategoria,
   getCategoriaById,
   getCategorias,
-} from "../../data/categorias/categorias.js";
+} from "../data/categorias.js";
 import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
-//funcion para generar un objeto para ser retornado en create, edit y delete. Informando un mensaje y el resultado
+//funcion para generar un objeto q va a ser retornado en create, edit y delete. Informando un mensaje y el resultado
 const generateResult = (message, result) => ({
   message: message,
   result: result,
 });
 
-//debe recibir un objeto categoria --> {nombre: "nombre categoria"}
+//debe recibir un objeto categoria por el req.body --> {nombre: "nombre categoria"}
 router.post("/createCategoria", async (req, res) => {
   try {
     const result = await createCategoria(req.body);

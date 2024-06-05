@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { ObjectId } from "mongodb";
-import getConnection from "../conn.js";
+import getConnection from "./conn.js";
 const DATABASE = process.env.DATABASE;
 const CATEGORIAS = process.env.CATEGORIAS;
 const ERROR_INSERTAR = "Error al insertar la categoría: ";

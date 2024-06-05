@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import categoriasRouter from "./routes/categorias/categorias.js";
+import categoriasRouter from "./routes/categorias.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
