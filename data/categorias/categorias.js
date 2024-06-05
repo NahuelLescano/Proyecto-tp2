@@ -28,7 +28,8 @@ async function getCategoria(nombreCat) {
   }
 }
 
-//funcion para POST que crea una categoria nueva
+//funcion para POST que crea una categoria nueva, a partir de un objeto recibido por parametro.
+//categoria debe ser { nombre: ... }
 export async function createCategoria(categoria) {
   if (!categoriaValida(categoria)) {
     throw new Error(ERROR_INSERTAR + "Datos de categoria invalidos");
