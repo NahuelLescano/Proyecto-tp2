@@ -21,7 +21,7 @@ router.post("/createCategoria", async (req, res) => {
   try {
     const result = await createCategoria(req.body);
     if (result instanceof Error) {
-      return res.status(400).send(result);
+      return res.status(400).send(result.message);
     }
     res
       .status(201)
