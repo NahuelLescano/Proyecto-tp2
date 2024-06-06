@@ -52,10 +52,11 @@ router.get("/getCategorias/:id", async (req, res) => {
   try {
     const result = await getCategoriaById(req.params.id);
 
-    if (!result)
+    if (!result) {
       return res
         .status(404)
         .send(`Categoría (id: ${req.params.id}) no encontrada`);
+    }
 
     res.status(200).send(result);
   } catch (error) {
