@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import {
+    buscarPorCredenciales,
     createUsuarios,
     deleteUsuarios,
+    generarTokenAuth,
     getUsuarios,
     getUsuariosId,
 } from "../data/Usuarios.js";
@@ -23,18 +25,13 @@ router.get("/", async (_req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
-        const { nombre, email, password } = req.body;
-        const usuarioCreado = await createUsuarios({
-            nombre,
-            email,
-            password,
-        });
+        const { email, password } = req.body;
+        const usuario = await buscarPorCredenciales(email, password);
+        const token = generarTokenAuth(usuario);
 
-        return res
-            .status(201)
-            .json({ message: "Usuario creado exitosamente", usuarioCreado });
+        return res.status(200).json({ message: "Usuario logeado", token });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -55,6 +52,23 @@ router.get("/:id", async (req, res) => {
         }
 
         return res.status(200).json(usuariosId);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+router.post("/register", async (req, res) => {
+    try {
+        const { nombre, email, password } = req.body;
+        const usuarioCreado = await createUsuarios({
+            nombre,
+            email,
+            password,
+        });
+
+        return res
+            .status(201)
+            .json({ message: "Usuario creado exitosamente", usuarioCreado });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

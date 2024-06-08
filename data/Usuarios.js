@@ -7,6 +7,8 @@ import getConnection from "./conn.js";
 const DATABASE = process.env.DATABASE || "componentes-ort";
 const COLLECTION = process.env.USUARIOS || "usuarios";
 
+// Helper function
+// TODO: Capas puede estar en una carpeta aparte para que cualquiera lo use.
 const getCliente = async () => {
     const conn = await getConnection();
     const usuarios = await conn.db(DATABASE).collection(COLLECTION);
@@ -25,6 +27,11 @@ export const createUsuarios = async ({ nombre, email, password }) => {
     const usuario = await conn.findOne({ email });
     if (usuario) {
         throw new Error("El usuario ya existe");
+    }
+
+    // password tiene que ser string para hashearlo con bcryptjs
+    if (typeof password !== "string") {
+        throw new Error("La contraseña debe ser un string");
     }
 
     const saltLength = 10;
@@ -66,7 +73,7 @@ export const buscarPorCredenciales = async (email, password) => {
         throw new Error("Usuario o contraseña inválida");
     }
 
-    return user;
+    return usuario;
 };
 
 export const generarTokenAuth = ({ _id, email }) => {
