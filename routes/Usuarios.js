@@ -1,17 +1,16 @@
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import {
-    buscarPorCredenciales,
     createUsuarios,
     deleteUsuarios,
-    generarTokenAuth,
     getUsuarios,
     getUsuariosId,
+    updateUsuarios,
 } from "../data/Usuarios.js";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/getUsuarios", async (req, res) => {
     try {
         const usuarios = await getUsuarios();
         if (!usuarios || usuarios.length === 0) {
@@ -25,19 +24,39 @@ router.get("/", async (_req, res) => {
     }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/createUsuarios", async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const usuario = await buscarPorCredenciales(email, password);
-        const token = generarTokenAuth(usuario);
+        const { nombre, email, password } = req.body;
+        const usuarioCreado = await createUsuarios({
+            nombre,
+            email,
+            password,
+        });
 
-        return res.status(200).json({ message: "Usuario logeado", token });
+        return res
+            .status(201)
+            .json({ message: "Usuario creado exitosamente", usuarioCreado });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.put("/editUsuario", async (req, res) => {
+    try {
+        const { _id, nombre, email, password } = req.body;
+        const usuarioActualizado = await updateUsuarios({
+            _id,
+            nombre,
+            email,
+            password,
+        });
+        return res.status(202).json(usuarioActualizado);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+router.get("/getUsuarios/:id", async (req, res) => {
     try {
         const { id } = req.params;
         if (!ObjectId.isValid(id)) {
@@ -57,24 +76,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.post("/register", async (req, res) => {
-    try {
-        const { nombre, email, password } = req.body;
-        const usuarioCreado = await createUsuarios({
-            nombre,
-            email,
-            password,
-        });
-
-        return res
-            .status(201)
-            .json({ message: "Usuario creado exitosamente", usuarioCreado });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-});
-
-router.delete("/:id", async (req, res) => {
+router.delete("/deleteUsuarios/:id", async (req, res) => {
     try {
         const { id } = req.params;
         if (!ObjectId.isValid(id)) {

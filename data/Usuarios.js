@@ -60,25 +60,32 @@ export const deleteUsuarios = async (userId) => {
     return usuarioEliminado;
 };
 
-export const buscarPorCredenciales = async (email, password) => {
+export const updateUsuarios = async ({ _id, nombre, email, password }) => {
+    if (!_id || !nombre || !email || !password) {
+        throw new Error("Faltan datos de usuarios");
+    }
+
     const conn = await getCliente();
-
-    const usuario = await conn.findOne({ email });
+    const query = { _id: new ObjectId(_id) };
+    const usuario = await conn.findOne(query);
     if (!usuario) {
-        throw new Error("Usuario o contraseña inválida");
+        throw new Error("No hay usuarios registrados con ese id");
     }
 
-    const match = await bcryptjs.compare(password, usuario.password);
-    if (!match) {
-        throw new Error("Usuario o contraseña inválida");
+    if (typeof password !== "string") {
+        throw new Error("La contraseña debe ser un string");
     }
 
-    return usuario;
-};
+    const saltLength = 10;
+    password = await bcryptjs.hash(password, saltLength);
 
-export const generarTokenAuth = ({ _id, email }) => {
-    const token = jwt.sign({ _id, email }, process.env.CLAVE_SECRETA, {
-        expiresIn: "1h",
+    const usuarioActualizado = await conn.updateOne(query, {
+        $set: {
+            nombre,
+            email,
+            password,
+        },
     });
-    return token;
+
+    return usuarioActualizado;
 };
