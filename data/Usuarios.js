@@ -1,7 +1,6 @@
 import "dotenv/config";
 import bcryptjs from "bcryptjs";
 import { ObjectId } from "mongodb";
-import jwt from "jsonwebtoken";
 import getConnection from "./conn.js";
 
 const DATABASE = process.env.DATABASE || "componentes-ort";
