@@ -12,7 +12,7 @@ export default async function getConnection() {
             instance = await client.connect();
         } catch (error) {
             console.error(error);
-        }
-    }
-    return instance;
+      }
+  }
+  return instance;
 }
