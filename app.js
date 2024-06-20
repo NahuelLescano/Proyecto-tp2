@@ -3,15 +3,18 @@ import express from "express";
 import morgan from "morgan";
 import usuariosRoutes from "./routes/Usuarios.js";
 import categoriasRouter from "./routes/categorias.js";
-import usuariosRouter from "./routes/usuarios.js";
+import productosRouter from "./routes/productos.js";
+import cors from "cors";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/categorias", categoriasRouter);
-app.use("/api/usuarios", usuariosRouter);
+app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/productos", productosRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running in http://localhost:${PORT}`);
