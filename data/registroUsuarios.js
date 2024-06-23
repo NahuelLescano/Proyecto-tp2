@@ -24,13 +24,20 @@ export async function addUsuario(usuario) {
   if (!usuarioValido(usuario)) {
     throw new Error("Usuario Invalido");
   }
+
   try {
+
     const usuarios = await getUsuarios();
+  const usuarioAEncontrar = await usuarios.findOne({ email: email });
+  if (!usuarioAEncontrar) {
+    throw new Error("Email ya registrado");
+  }
     usuario.password = await bcryptjs.hash(usuario.password, 10);
     const nuevoUsuario = await usuarios.insertOne(usuario);
     return nuevoUsuario;
+
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
 
