@@ -26,12 +26,13 @@ export async function addUsuario(usuario) {
   }
 
   try {
-
     const usuarios = await getUsuarios();
-  const usuarioAEncontrar = await usuarios.findOne({ email: email });
-  if (!usuarioAEncontrar) {
-    throw new Error("Email ya registrado");
-  }
+    const usuarioAEncontrar = await usuarios.findOne({ email: email });
+
+    if (!usuarioAEncontrar) {
+      throw new Error("Email ya registrado");
+    }
+    
     usuario.password = await bcryptjs.hash(usuario.password, 10);
     const nuevoUsuario = await usuarios.insertOne(usuario);
     return nuevoUsuario;
