@@ -3,8 +3,10 @@ import { addProduct, getProducts, getFilteredProducts, getProductById, editProdu
 
 const router = express.Router();
 
+import auth from "../middleware/auth.js";
+
 // Ruta /createProd, encargada de crear un producto nuevo.
-router.post('/createProd', async (req, res) => {
+router.post('/createProd', auth, async (req, res) => {
     try {
         const { nombre, precio, stock, destacado, categoria } = req.body;
 
@@ -26,7 +28,7 @@ router.post('/createProd', async (req, res) => {
 })
 
 // Ruta /getProductos, encargada de traer todos los productos.
-router.get('/getProductos', async (req, res) => {
+router.get('/getProductos', auth, async (req, res) => {
     try {
         const products = await getProducts();
         res.json({ products });
@@ -37,12 +39,12 @@ router.get('/getProductos', async (req, res) => {
 })
 
 // Ruta /getProductos que recibe filtros.
-router.get('/getProductos', (req, res) => {
+router.get('/getProductos', auth, (req, res) => {
 
 })
 
 // Ruta /getProductos/:id recibe un ID.
-router.get('/getProductos/:id', async (req, res) => {
+router.get('/getProductos/:id', auth, async (req, res) => {
     const id = req.params.id;
 
     try {
@@ -59,7 +61,7 @@ router.get('/getProductos/:id', async (req, res) => {
 });
 
 // Ruta /editProd, recibe un producto actualizado.
-router.put('/editProd', async (req, res) => {
+router.put('/editProd', auth, async (req, res) => {
 
     try {
         const { id, nombre, precio, stock, destacado, categoria } = req.body;
@@ -84,7 +86,7 @@ router.put('/editProd', async (req, res) => {
 })
 
 // Ruta /deleteProd/:id, recibe un ID y elimina el producto correspondiente.
-router.get('/deleteProd/:id', async (req, res) => {
+router.get('/deleteProd/:id', auth, async (req, res) => {
     try {
         const id = req.params.id;
         await deleteProductById(id);

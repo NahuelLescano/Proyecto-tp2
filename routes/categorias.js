@@ -7,7 +7,7 @@ import {
     getCategorias,
 } from "../data/categorias.js";
 import { ObjectId } from "mongodb";
-
+import auth from "../middleware/auth.js";
 const router = express.Router();
 
 //funcion para generar un objeto q va a ser retornado en create, edit y delete. Informando un mensaje y el resultado
@@ -17,7 +17,7 @@ const generateResult = (message, result) => ({
 });
 
 //debe recibir un objeto categoria por el req.body --> {nombre: "nombre categoria"}
-router.post("/createCategoria", async (req, res) => {
+router.post("/createCategoria", auth, async (req, res) => {
     try {
         const result = await createCategoria(req.body);
         if (result instanceof Error) {
@@ -32,7 +32,7 @@ router.post("/createCategoria", async (req, res) => {
 });
 
 //obtiene todas las categorias
-router.get("/getCategorias", async (req, res) => {
+router.get("/getCategorias", auth, async (req, res) => {
     try {
         const result = await getCategorias();
         if (result.length === 0)
@@ -44,7 +44,7 @@ router.get("/getCategorias", async (req, res) => {
 });
 
 //obtiene una categoria que coincida con el id enviado por url param
-router.get("/getCategorias/:id", async (req, res) => {
+router.get("/getCategorias/:id", auth, async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
         return res.status(400).send("ID inválido");
     }
@@ -65,7 +65,7 @@ router.get("/getCategorias/:id", async (req, res) => {
 });
 
 //en el body se debe enviar el objeto editado
-router.put("/editCategoria", async (req, res) => {
+router.put("/editCategoria", auth, async (req, res) => {
     if (!ObjectId.isValid(req.body._id)) {
         return res.status(400).send("ID inválido");
     }
@@ -87,7 +87,7 @@ router.put("/editCategoria", async (req, res) => {
     }
 });
 
-router.delete("/deleteCategoria/:id", async (req, res) => {
+router.delete("/deleteCategoria/:id", auth, async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
         return res.status(400).send("ID inválido");
     }
