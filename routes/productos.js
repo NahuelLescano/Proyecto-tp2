@@ -8,14 +8,14 @@ import auth from "../middleware/auth.js";
 // Ruta /createProd, encargada de crear un producto nuevo.
 router.post('/createProd', auth, async (req, res) => {
     try {
-        const { nombre, precio, stock, destacado, categoria } = req.body;
+        const { nombre, precio, stock, destacado, categoriaId } = req.body;
 
         const product = {
             nombre: nombre,
             precio: precio,
             stock: stock,
             destacado: destacado,
-            categoria: categoria
+            categoriaId: categoriaId
         }
 
         let result = await addProduct(product);
