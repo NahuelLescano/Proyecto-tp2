@@ -55,6 +55,27 @@ export async function getProductosByCategoria(params) {
     }
 }
 
+export async function getFilteredProducts(params) {
+    try {
+        const conndb = await getConnection();
+        const filter = {};
+
+        if (params.Categoria) {
+            filter.categoria = params.Categoria;
+        }
+        if (params.Destacado === 'true') {
+            filter.destacado = true;
+        }
+
+        const productos = await conndb.db(DATABASE).collection(PRODUCTOS).find(filter).toArray();
+
+        return { success: true, productos };
+    } catch (error) {
+        console.error("Error al obtener productos filtrados:", error);
+        return { success: false, message: "Error al obtener productos filtrados" };
+    }
+}
+
 export async function editProduct(product) {
     const filter = { _id: new ObjectId(product.id) };
     const updateDoc = {
