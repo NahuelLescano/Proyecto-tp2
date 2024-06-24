@@ -55,21 +55,19 @@ export async function getProductosByCategoria(params) {
     }
 }
 
-export async function getFilteredProducts(params) {
+export async function getFilteredProducts(categoriaId, destacado) {
     try {
-        const conndb = await getConnection();
-        const filter = {};
-
-        if (params.Categoria) {
-            filter.categoria = params.Categoria;
+        let filteredProducts = await getProducts();
+        
+        if (categoriaId) {
+            filteredProducts = filteredProducts.filter(p => p.categoriaId == categoriaId);
         }
-        if (params.Destacado === 'true') {
-            filter.destacado = true;
+        if (destacado !== undefined) {
+            const b = destacado === "true";
+            filteredProducts = filteredProducts.filter(p => p.destacado == b);
         }
-
-        const productos = await conndb.db(DATABASE).collection(PRODUCTOS).find(filter).toArray();
-
-        return { success: true, productos };
+        
+        return { success: true, filteredProducts };
     } catch (error) {
         console.error("Error al obtener productos filtrados:", error);
         return { success: false, message: "Error al obtener productos filtrados" };

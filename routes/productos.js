@@ -1,5 +1,5 @@
 import express from "express";
-import { addProduct, getProducts, getProductosByCategoria, getProductById, editProduct, deleteProductById } from "../data/productos.js";
+import { addProduct, getProducts, getProductosByCategoria, getProductById, editProduct, deleteProductById, getFilteredProducts } from "../data/productos.js";
 
 const router = express.Router();
 
@@ -27,6 +27,18 @@ router.post('/createProd', auth, async (req, res) => {
     }
 })
 
+// Ruta /getProductos que recibe filtros.
+router.get('/getProductos', auth, async (req, res) => {
+    const {categoria, destacado} = req.query;
+    try {
+        console.log(`destacado = ${destacado}`)
+        const filtProducts = await getFilteredProducts(categoria, destacado);
+        res.status(200).json(filtProducts)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
 // Ruta /getProductos, encargada de traer todos los productos.
 router.get('/getProductos', auth, async (req, res) => {
     try {
@@ -37,6 +49,8 @@ router.get('/getProductos', auth, async (req, res) => {
         res.send("Error al obtener todos los productos");
     }
 })
+
+
 
 // Ruta /getProductos que recibe filtros.
 router.get('/getProductos/:categoriaId', auth, async (req, res) => {
