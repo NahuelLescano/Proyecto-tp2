@@ -31,7 +31,6 @@ router.post('/createProd', auth, async (req, res) => {
 router.get('/getProductos', auth, async (req, res) => {
     const {categoria, destacado} = req.query;
     try {
-        console.log(`destacado = ${destacado}`)
         const filtProducts = await getFilteredProducts(categoria, destacado);
         res.status(200).json(filtProducts)
     } catch (error) {
