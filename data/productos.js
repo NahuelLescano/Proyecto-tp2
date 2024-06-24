@@ -79,6 +79,7 @@ export async function editProduct(product) {
     const updateDoc = {
         $set: {
             nombre: product.nombre,
+            descripcion: product.descripcion,
             precio: product.precio,
             stock: product.stock,
             categoria: product.categoria,

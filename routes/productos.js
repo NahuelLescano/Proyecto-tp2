@@ -8,10 +8,11 @@ import auth from "../middleware/auth.js";
 // Ruta /createProd, encargada de crear un producto nuevo.
 router.post('/createProd', auth, async (req, res) => {
     try {
-        const { nombre, precio, stock, destacado, categoriaId } = req.body;
+        const { nombre, descripcion, precio, stock, destacado, categoriaId } = req.body;
 
         const product = {
             nombre: nombre,
+            descripcion: descripcion,
             precio: precio,
             stock: stock,
             destacado: destacado,
@@ -83,11 +84,12 @@ router.get('/getProductos/:id', auth, async (req, res) => {
 router.put('/editProd', auth, async (req, res) => {
 
     try {
-        const { id, nombre, precio, stock, destacado, categoria } = req.body;
+        const { id, nombre,descripcion, precio, stock, destacado, categoria } = req.body;
 
         const product = {
             id: id,
             nombre: nombre,
+            descripcion: descripcion,
             precio: precio,
             stock: stock,
             destacado: destacado,
