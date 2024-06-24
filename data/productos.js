@@ -55,6 +55,25 @@ export async function getProductosByCategoria(params) {
     }
 }
 
+export async function getFilteredProducts(categoriaId, destacado) {
+    try {
+        let filteredProducts = await getProducts();
+        
+        if (categoriaId) {
+            filteredProducts = filteredProducts.filter(p => p.categoriaId == categoriaId);
+        }
+        if (destacado !== undefined) {
+            const b = destacado === "true";
+            filteredProducts = filteredProducts.filter(p => p.destacado == b);
+        }
+        
+        return { success: true, filteredProducts };
+    } catch (error) {
+        console.error("Error al obtener productos filtrados:", error);
+        return { success: false, message: "Error al obtener productos filtrados" };
+    }
+}
+
 export async function editProduct(product) {
     const filter = { _id: new ObjectId(product.id) };
     const updateDoc = {
