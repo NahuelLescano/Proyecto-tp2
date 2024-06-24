@@ -3,7 +3,7 @@ import { loginAdmin } from "../data/Admin.js";
 
 const router = express.Router();
 
-//debe recibir un objeto categoria por el req.body --> {email: "nombre email"}
+
 router.post("/loginAdmin", async (req, res) => {
   try {
     const { email, password } = req.body;
