@@ -3,8 +3,7 @@ import { loginAdmin } from "../data/Admin.js";
 
 const router = express.Router();
 
-
-router.post("/loginAdmin", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const token = await loginAdmin(email, password);
