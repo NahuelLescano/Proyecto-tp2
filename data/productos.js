@@ -46,24 +46,12 @@ export async function getProducts() {
     return products;
 }
 
-export async function getFilteredProducts(params) {
+export async function getProductosByCategoria(params) {
     try {
-        const conndb = await getConnection();
-        const filter = {};
-
-        if (params.Categoria) {
-            filter.categoria = params.Categoria;
-        }
-        if (params.Destacado === 'true') {
-            filter.destacado = true;
-        }
-
-        const productos = await conndb.db(DATABASE).collection(PRODUCTOS).find(filter).toArray();
-
-        return { success: true, productos };
+        const productosByCategoria = await conndb.db(DATABASE).collection(PRODUCTOS).find({categoriaId: new ObjectId(params)}).toArray()
+        return productosByCategoria
     } catch (error) {
-        console.error("Error al obtener productos filtrados:", error);
-        return { success: false, message: "Error al obtener productos filtrados" };
+        throw new Error (error);
     }
 }
 
