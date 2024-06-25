@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 const DATABASE = process.env.DATABASE;
 const USUARIOS = process.env.USUARIOS;
 
-
 export async function loginAdmin(userEmail, userPassword) {
   try {
     const usuario = { email: userEmail, password: userPassword };
@@ -24,14 +23,18 @@ export async function loginAdmin(userEmail, userPassword) {
 
 //valida que el objeto categoria tenga .nombre
 function usuarioAdmin(usuario) {
-  return usuario.admin ? true : false;
+  let esAdmin = false;
+  if (usuario.admin != undefined) {
+    esAdmin = usuario.admin;
+  }
+  return esAdmin;
 }
 
 async function getUsuario(usuario) {
   const conndb = await getConnection();
   const user = await conndb
     .db(DATABASE)
-    .COLLECTION(USUARIOS)
+    .collection(USUARIOS)
     .findOne({ email: usuario.email });
 
   if (!user) {
@@ -43,7 +46,7 @@ async function getUsuario(usuario) {
     throw new Error("Usuario o contraseña incorrecta.");
   }
 
-  return usuario;
+  return user;
 }
 
 export async function generarAuthToken(usuario) {
