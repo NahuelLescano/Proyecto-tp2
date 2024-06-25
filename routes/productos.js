@@ -52,17 +52,6 @@ router.get('/getProductos', auth, async (req, res) => {
 
 
 
-// Ruta /getProductos que recibe filtros.
-router.get('/getProductos/:categoriaId', auth, async (req, res) => {
-    try {
-        const categoriaId  = req.params.categoriaId;
-        const productosByCategoria = await getProductosByCategoria(categoriaId);
-        res.json(productosByCategoria);
-    } catch (error){
-        res.status(500).send(error);
-    }
-});
-
 // Ruta /getProductos/:id recibe un ID.
 router.get('/getProductos/:id', auth, async (req, res) => {
     const id = req.params.id;
