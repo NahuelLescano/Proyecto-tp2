@@ -6,11 +6,11 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-   
+
     const token = await loginAdmin(email, password);
-    
+
     if (token instanceof Error) {
-      return res.status(401).send(token.message);
+      return res.status(401).send({ error: token.message });
     }
     res.status(200).send({ token: token });
   } catch (error) {

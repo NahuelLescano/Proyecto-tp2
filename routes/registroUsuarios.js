@@ -22,7 +22,7 @@ routerUsuario.post("/login", async (req, res) => {
     const token = await generarAuthToken(usuario);
     res.status(200).send({ token });
   } catch (error) {
-    res.status(401).send(error.message);
+    res.status(401).send({error: error.message});
   }
 });
 
