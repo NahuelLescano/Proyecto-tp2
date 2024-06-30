@@ -66,3 +66,13 @@ export async function generarAuthToken(usuario) {
   );
   return token;
 }
+
+export async function verificarToken(token){
+  const result = await jwt.verify(token, process.env.CLAVE_SECRETA, (err, res)=>{
+    if(err){
+      return "el token ha expirado"
+    }
+    return res;
+  });
+  return result;
+}
