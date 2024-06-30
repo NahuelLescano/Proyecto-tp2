@@ -46,14 +46,6 @@ export async function getProducts() {
     return products;
 }
 
-export async function getProductosByCategoria(params) {
-    try {
-        const productosByCategoria = await conndb.db(DATABASE).collection(PRODUCTOS).find({categoriaId: params}).toArray()
-        return productosByCategoria
-    } catch (error) {
-        throw new Error (error);
-    }
-}
 
 export async function getFilteredProducts(categoriaId, destacado) {
     try {
