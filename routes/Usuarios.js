@@ -114,7 +114,7 @@ router.delete("/deleteUsuario/:id", auth, async (req, res) => {
 
     const usuarioEliminado = await deleteUsuario(id);
 
-    if (usuarioEliminado.deleteCount === 0) {
+    if (usuarioEliminado.deletedCount === 0) {
       return res.status(404).json({
         success: false,
         message: `Usuario (id: ${id}) no encontrado`,
@@ -123,7 +123,7 @@ router.delete("/deleteUsuario/:id", auth, async (req, res) => {
 
     return res.status(202).json({
       success: true,
-      message: "El usuario fue eliminado",
+      message: `Usuario (id: ${id}) fue eliminado`,
       result: usuarioEliminado,
     });
   } catch (error) {
