@@ -23,7 +23,7 @@ router.post("/createCategoria", auth, async (req, res) => {
       result,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
@@ -40,7 +40,7 @@ router.get("/getCategorias", async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
@@ -48,7 +48,7 @@ router.get("/getCategorias", async (req, res) => {
 //obtiene una categoria que coincida con el id enviado por url param
 router.get("/getCategorias/:id", async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -63,14 +63,14 @@ router.get("/getCategorias/:id", async (req, res) => {
 
     res.status(200).json({ success: true, result });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
 //en el body se debe enviar el objeto editado
 router.put("/editCategoria", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -89,13 +89,13 @@ router.put("/editCategoria", auth, async (req, res) => {
       result,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
 router.delete("/deleteCategoria/:id", auth, async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -107,13 +107,13 @@ router.delete("/deleteCategoria/:id", auth, async (req, res) => {
         message: `Categoría (id: ${req.params.id}) no encontrada`,
       });
     }
-    res.status(200).send({
+    res.status(202).send({
       success: true,
       message: `Se eliminó la categoría exitosamente`,
       result,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 

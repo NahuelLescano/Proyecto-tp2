@@ -39,7 +39,7 @@ router.post("/createProducto", auth, async (req, res) => {
       result,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
@@ -58,7 +58,7 @@ router.get("/getProductos", auth, async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
@@ -66,7 +66,7 @@ router.get("/getProductos", auth, async (req, res) => {
 router.get("/getProductos/:id", auth, async (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -80,14 +80,14 @@ router.get("/getProductos/:id", auth, async (req, res) => {
     }
   } catch (error) {
     console.error("Error al obtener producto por ID:", error);
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
 // Ruta /editProd, recibe un producto actualizado.
 router.put("/editProducto", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -120,14 +120,14 @@ router.put("/editProducto", auth, async (req, res) => {
     });
   } catch (error) {
     console.error("El producto no pudo ser actualizado : ", error);
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
 // Ruta /deleteProd/:id, recibe un ID y elimina el producto correspondiente.
 router.get("/deleteProducto/:id", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send({ success: false, message: "ID inválido" });
+    return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -139,14 +139,14 @@ router.get("/deleteProducto/:id", auth, async (req, res) => {
         message: `Producto (id: ${id}) no encontrado`,
       });
     }
-    res.status(200).json({
+    res.status(202).json({
       success: true,
       message: `Se eliminó el producto exitosamente`,
       result,
     });
   } catch (error) {
     console.error("El producto no pudo ser eliminado : ", error);
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
