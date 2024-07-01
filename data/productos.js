@@ -17,7 +17,7 @@ export async function addProduct(product) {
         .db(DATABASE)
         .collection(PRODUCTOS)
         .insertOne(product);
-      return { success: true, result: addedP };
+      return addedP;
     }
   } catch (error) {
     console.error("Error al crear un producto : ", error);
