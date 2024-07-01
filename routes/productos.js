@@ -125,8 +125,8 @@ router.put("/editProducto", auth, async (req, res) => {
 });
 
 // Ruta /deleteProd/:id, recibe un ID y elimina el producto correspondiente.
-router.get("/deleteProducto/:id", auth, async (req, res) => {
-  if (!ObjectId.isValid(req.body._id)) {
+router.delete("/deleteProducto/:id", auth, async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ success: false, message: "ID inválido" });
   }
 
