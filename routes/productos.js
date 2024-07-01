@@ -66,7 +66,7 @@ router.get("/getProductos", auth, async (req, res) => {
 router.get("/getProductos/:id", auth, async (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -87,7 +87,7 @@ router.get("/getProductos/:id", auth, async (req, res) => {
 // Ruta /editProd, recibe un producto actualizado.
 router.put("/editProducto", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -127,7 +127,7 @@ router.put("/editProducto", auth, async (req, res) => {
 // Ruta /deleteProd/:id, recibe un ID y elimina el producto correspondiente.
 router.get("/deleteProducto/:id", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {

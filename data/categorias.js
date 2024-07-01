@@ -46,7 +46,7 @@ export async function createCategoria(categoria) {
   //verifica si recibe un objeto, si lo recibe, significa que existe una categoria con ese nombre.
   if (verificaCat) {
     return new Error(
-      ERROR_INSERTAR + `Categoria '${categoria.nombre}'ya existe`
+      ERROR_INSERTAR + `Categoria '${categoria.nombre}' ya existe`
     );
   }
 

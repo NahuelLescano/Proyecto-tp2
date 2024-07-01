@@ -10,12 +10,6 @@ import { ObjectId } from "mongodb";
 import auth from "../middleware/auth.js";
 const router = express.Router();
 
-//funcion para generar un objeto q va a ser retornado en create, edit y delete. Informando un mensaje y el resultado
-const generateResult = (message, result) => ({
-  message: message,
-  result: result,
-});
-
 //debe recibir un objeto categoria por el req.body --> {nombre: "nombre categoria"}
 router.post("/createCategoria", auth, async (req, res) => {
   try {
@@ -54,7 +48,7 @@ router.get("/getCategorias", async (req, res) => {
 //obtiene una categoria que coincida con el id enviado por url param
 router.get("/getCategorias/:id", async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -76,7 +70,7 @@ router.get("/getCategorias/:id", async (req, res) => {
 //en el body se debe enviar el objeto editado
 router.put("/editCategoria", auth, async (req, res) => {
   if (!ObjectId.isValid(req.body._id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {
@@ -101,7 +95,7 @@ router.put("/editCategoria", auth, async (req, res) => {
 
 router.delete("/deleteCategoria/:id", auth, async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) {
-    return res.status(400).send("ID inválido");
+    return res.status(400).send({ success: false, message: "ID inválido" });
   }
 
   try {
