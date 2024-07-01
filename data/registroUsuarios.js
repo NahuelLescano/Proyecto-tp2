@@ -8,7 +8,7 @@ const USUARIOS = process.env.USUARIOS;
 
 function usuarioValido(usuario) {
   let resultado = true;
-  if (!usuario.email || !usuario.password) {
+  if (!usuario.nombre || !usuario.email || !usuario.password) {
     resultado = false;
   }
   return resultado;
@@ -22,57 +22,72 @@ export async function getUsuarios() {
 
 export async function addUsuario(usuario) {
   if (!usuarioValido(usuario)) {
-    throw new Error("Usuario Invalido");
+    return new Error("Datos del usuario invalidos");
   }
 
   try {
-  const usuarios = await getUsuarios();
-  const usuarioAEncontrar = await usuarios.findOne({ email: usuario.email });
-  if (usuarioAEncontrar) {
-    throw new Error("Email ya registrado");
-  }
+    const usuarios = await getUsuarios();
+    const usuarioAEncontrar = await usuarios.findOne({ email: usuario.email });
+    if (usuarioAEncontrar) {
+      return new Error("Email ya registrado");
+    }
     usuario.password = await bcryptjs.hash(usuario.password, 10);
     const nuevoUsuario = await usuarios.insertOne(usuario);
     return nuevoUsuario;
-
   } catch (error) {
-    throw error;
+    console.error("Error al registrar un usuario: ", error);
+    throw { success: false, errorMessage: error.message };
   }
 }
 
 export async function getPorCredencial(email, password) {
-  const usuarios = await getUsuarios();
-  const usuarioAEncontrar = await usuarios.findOne({ email: email });
-  if (!usuarioAEncontrar) {
-    throw new Error("Credenciales Invalidas");
-  }
+  try {
+    const usuarios = await getUsuarios();
+    const usuarioAEncontrar = await usuarios.findOne({ email: email });
+    if (!usuarioAEncontrar) {
+      return new Error("Credenciales Invalidas");
+    }
 
-  const coincidencia = await bcryptjs.compare(
-    password,
-    usuarioAEncontrar.password
-  );
+    const coincidencia = await bcryptjs.compare(
+      password,
+      usuarioAEncontrar.password
+    );
 
-  if (!coincidencia) {
-    throw new Error("Credenciales Invalidas");
+    if (!coincidencia) {
+      return new Error("Credenciales Invalidas");
+    }
+
+    return usuarioAEncontrar;
+  } catch (error) {
+    console.error("Error al loguear un usuario: ", error);
+    throw { success: false, errorMessage: error.message };
   }
-  return usuarioAEncontrar;
 }
 
 export async function generarAuthToken(usuario) {
-  const token = await jwt.sign(
-    { _id: usuario._id, email: usuario.email },
-    process.env.CLAVE_SECRETA,
-    { expiresIn: "2h" }
-  );
-  return token;
+  try {
+    const token = await jwt.sign(
+      { _id: usuario._id, email: usuario.email },
+      process.env.CLAVE_SECRETA,
+      { expiresIn: "2h" }
+    );
+    return token;
+  } catch (error) {
+    console.error("Error al crear Auth Token: ", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
-export async function verificarToken(token){
-  const result = await jwt.verify(token, process.env.CLAVE_SECRETA, (err, res)=>{
-    if(err){
-      return "el token ha expirado"
+export async function verificarToken(token) {
+  const result = await jwt.verify(
+    token,
+    process.env.CLAVE_SECRETA,
+    (err, res) => {
+      if (err) {
+        return "el token ha expirado";
+      }
+      return res;
     }
-    return res;
-  });
+  );
   return result;
 }

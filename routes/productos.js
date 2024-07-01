@@ -1,111 +1,153 @@
+import { ObjectId } from "mongodb";
 import express from "express";
-import { addProduct, getProducts, getProductosByCategoria, getProductById, editProduct, deleteProductById, getFilteredProducts } from "../data/productos.js";
+import {
+  addProduct,
+  getProducts,
+  getProductById,
+  editProduct,
+  deleteProductById,
+} from "../data/productos.js";
 
 const router = express.Router();
 
 import auth from "../middleware/auth.js";
 
 // Ruta /createProd, encargada de crear un producto nuevo.
-router.post('/createProd', auth, async (req, res) => {
-    try {
-        const { nombre, descripcion, precio, stock, destacado, categoriaId } = req.body;
+router.post("/createProducto", auth, async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, stock, destacado, categoriaId } =
+      req.body;
 
-        const product = {
-            nombre: nombre,
-            descripcion: descripcion,
-            precio: precio,
-            stock: stock,
-            destacado: destacado,
-            categoriaId: categoriaId
-        }
+    const product = {
+      nombre: nombre,
+      descripcion: descripcion,
+      precio: precio,
+      stock: stock,
+      destacado: destacado,
+      categoriaId: categoriaId,
+    };
 
-        let result = await addProduct(product);
+    const result = await addProduct(product);
 
-        res.send(result);
-    } catch (error) {
-        console.error("Error al crear un producto : ", error);
-        res.send(result)
+    if (result instanceof Error) {
+      return res.status(400).json({ success: false, message: result.message });
     }
-})
 
-// Ruta /getProductos que recibe filtros.
-router.get('/getProductos', auth, async (req, res) => {
-    const {categoria, destacado} = req.query;
-    try {
-        const filtProducts = await getFilteredProducts(categoria, destacado);
-        res.status(200).json(filtProducts)
-    } catch (error) {
-        res.status(400).send(error)
+    res.status(201).json({
+      success: true,
+      message: `Producto agregado exitosamente`,
+      result,
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+// Ruta /getProductos que recibe filtros, en caso de no recibir filtros devuelve todos los productos
+router.get("/getProductos", auth, async (req, res) => {
+  const { categoria, destacado } = req.query;
+  try {
+    const products = await getProducts(categoria, destacado);
+
+    if (products.products.length == 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hay productos que cumplan con la petición",
+      });
     }
-})
 
-// Ruta /getProductos, encargada de traer todos los productos.
-router.get('/getProductos', auth, async (req, res) => {
-    try {
-        const products = await getProducts();
-        res.json({ products });
-    } catch (error) {
-        console.error("Error al obtener todos los productos : ", error);
-        res.send("Error al obtener todos los productos");
-    }
-})
-
-
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
 // Ruta /getProductos/:id recibe un ID.
-router.get('/getProductos/:id', auth, async (req, res) => {
-    const id = req.params.id;
+router.get("/getProductos/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, message: "ID inválido" });
+  }
 
-    try {
-        const producto = await getProductById(id);
-        if (producto) {
-            res.json({ success: true, producto });
-        } else {
-            res.status(404).json({ success: false, message: 'Producto no encontrado' });
-        }
-    } catch (error) {
-        console.error('Error al obtener producto por ID:', error);
-        res.status(500).json({ success: false, message: 'Error al obtener producto por ID' });
+  try {
+    const producto = await getProductById(id);
+    if (producto) {
+      res.status(200).json({ success: true, producto });
+    } else {
+      res
+        .status(404)
+        .json({ success: false, message: `Producto (id:${id}) no encontrado` });
     }
+  } catch (error) {
+    console.error("Error al obtener producto por ID:", error);
+    res.status(500).json(error);
+  }
 });
 
 // Ruta /editProd, recibe un producto actualizado.
-router.put('/editProd', auth, async (req, res) => {
+router.put("/editProducto", auth, async (req, res) => {
+  if (!ObjectId.isValid(req.body._id)) {
+    return res.status(400).json({ success: false, message: "ID inválido" });
+  }
 
-    try {
-        const { id, nombre,descripcion, precio, stock, destacado, categoria } = req.body;
+  try {
+    const { _id, nombre, descripcion, precio, stock, destacado, categoria } =
+      req.body;
 
-        const product = {
-            id: id,
-            nombre: nombre,
-            descripcion: descripcion,
-            precio: precio,
-            stock: stock,
-            destacado: destacado,
-            categoria: categoria
-        }
+    const product = {
+      _id: _id,
+      nombre: nombre,
+      descripcion: descripcion,
+      precio: precio,
+      stock: stock,
+      destacado: destacado,
+      categoria: categoria,
+    };
 
-        let result = await editProduct(product);
+    const result = await editProduct(product);
 
-        res.send("El producto fue actualizado");
-    } catch (error) {
-        console.error("El producto no pudo ser actualizado : ", error);
-        res.send("Error al intentar actualizar el producto.");
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Producto (id: ${_id}) no encontrado`,
+      });
     }
 
-})
+    res.status(200).json({
+      success: true,
+      message: `Producto (id: ${_id}) editado exitosamente`,
+      result,
+    });
+  } catch (error) {
+    console.error("El producto no pudo ser actualizado : ", error);
+    res.status(500).json(error);
+  }
+});
 
 // Ruta /deleteProd/:id, recibe un ID y elimina el producto correspondiente.
-router.get('/deleteProd/:id', auth, async (req, res) => {
-    try {
-        const id = req.params.id;
-        await deleteProductById(id);
+router.get("/deleteProducto/:id", auth, async (req, res) => {
+  if (!ObjectId.isValid(req.body._id)) {
+    return res.status(400).json({ success: false, message: "ID inválido" });
+  }
 
-        res.send("El producto fue eliminado con exito");
-    } catch (error) {
-        console.error("El producto no pudo ser eliminado : ", error);
-        res.send("Error al intentar eliminar el producto.");
+  try {
+    const id = req.params.id;
+    const result = await deleteProductById(id);
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Producto (id: ${id}) no encontrado`,
+      });
     }
-})
+    res.status(202).json({
+      success: true,
+      message: `Se eliminó el producto exitosamente`,
+      result,
+    });
+  } catch (error) {
+    console.error("El producto no pudo ser eliminado : ", error);
+    res.status(500).json(error);
+  }
+});
 
 export default router;

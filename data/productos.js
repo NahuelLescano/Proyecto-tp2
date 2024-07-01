@@ -7,93 +7,105 @@ const PRODUCTOS = process.env.PRODUCTOS;
 const conndb = await getConnection();
 
 export async function addProduct(product) {
-
-    let result = await getProductByName(product.nombre);
-    let message = "";
+  try {
+    const result = await getProductByName(product.nombre);
 
     if (result != null) {
-        message = "El producto ya existe.";
+      return new Error(`El producto '${product.nombre}' ya existe`);
     } else {
-        const result = await conndb.db(DATABASE).collection(PRODUCTOS).insertOne(product);
-        message = "El producto fue agregado con exito";
+      const addedP = await conndb
+        .db(DATABASE)
+        .collection(PRODUCTOS)
+        .insertOne(product);
+      return addedP;
     }
-
-    return message;
+  } catch (error) {
+    console.error("Error al crear un producto : ", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
 async function getProductByName(nombre) {
-    try {
-        const producto = await conndb.db(DATABASE).collection(PRODUCTOS).findOne({ nombre: nombre });
-        return producto;
-    } catch (error) {
-        console.error("Error al obtener producto por nombre:", error);
-        return null;
-    }
+  try {
+    const producto = await conndb
+      .db(DATABASE)
+      .collection(PRODUCTOS)
+      .findOne({ nombre: nombre });
+    return producto;
+  } catch (error) {
+    console.error("Error al obtener producto por nombre:", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
 export async function getProductById(id) {
-    try {
-        const producto = await conndb.db(DATABASE).collection(PRODUCTOS).findOne({ _id: new ObjectId(id) });
-        return producto;
-    } catch (error) {
-        console.error("Error al obtener producto por ID:", error);
-        return null;
-    }
+  try {
+    const producto = await conndb
+      .db(DATABASE)
+      .collection(PRODUCTOS)
+      .findOne({ _id: new ObjectId(id) });
+    return producto;
+  } catch (error) {
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
-export async function getProducts() {
-    const products = await conndb.db(DATABASE).collection(PRODUCTOS).find({}).toArray();;
-    return products;
-}
+export async function getProducts(categoriaId, destacado) {
+  try {
+    let products = await conndb
+      .db(DATABASE)
+      .collection(PRODUCTOS)
+      .find({})
+      .toArray();
 
-export async function getProductosByCategoria(params) {
-    try {
-        const productosByCategoria = await conndb.db(DATABASE).collection(PRODUCTOS).find({categoriaId: params}).toArray()
-        return productosByCategoria
-    } catch (error) {
-        throw new Error (error);
+    if (categoriaId) {
+      products = products.filter((p) => p.categoriaId == categoriaId);
     }
-}
+    if (destacado !== undefined) {
+      const b = destacado === "true";
+      products = products.filter((p) => p.destacado == b);
+    }
 
-export async function getFilteredProducts(categoriaId, destacado) {
-    try {
-        let filteredProducts = await getProducts();
-        
-        if (categoriaId) {
-            filteredProducts = filteredProducts.filter(p => p.categoriaId == categoriaId);
-        }
-        if (destacado !== undefined) {
-            const b = destacado === "true";
-            filteredProducts = filteredProducts.filter(p => p.destacado == b);
-        }
-        
-        return { success: true, filteredProducts };
-    } catch (error) {
-        console.error("Error al obtener productos filtrados:", error);
-        return { success: false, message: "Error al obtener productos filtrados" };
-    }
+    return { success: true, products };
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
 export async function editProduct(product) {
-    const filter = { _id: new ObjectId(product.id) };
+  try {
+    const filter = { _id: new ObjectId(product._id) };
     const updateDoc = {
-        $set: {
-            nombre: product.nombre,
-            descripcion: product.descripcion,
-            precio: product.precio,
-            stock: product.stock,
-            categoria: product.categoria,
-            destacado: product.destacado
-        },
+      $set: {
+        nombre: product.nombre,
+        descripcion: product.descripcion,
+        precio: product.precio,
+        stock: product.stock,
+        categoria: product.categoria,
+        destacado: product.destacado,
+      },
     };
 
-    const result = await conndb.db(DATABASE).collection(PRODUCTOS).findOneAndUpdate(filter, updateDoc, {
-        returnOriginal: false,
-    });
+    const result = await conndb
+      .db(DATABASE)
+      .collection(PRODUCTOS)
+      .updateOne(filter, updateDoc);
 
     return result;
+  } catch (error) {
+    throw { success: false, errorMessage: error.message };
+  }
 }
 
 export async function deleteProductById(id) {
-    const result = await conndb.db(DATABASE).collection(PRODUCTOS).deleteOne({ _id: new ObjectId(id) });
+  try {
+    const result = await conndb
+      .db(DATABASE)
+      .collection(PRODUCTOS)
+      .deleteOne({ _id: new ObjectId(id) });
+    return result;
+  } catch (error) {
+    throw { success: false, errorMessage: error.message };
+  }
 }

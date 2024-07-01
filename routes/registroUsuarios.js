@@ -10,20 +10,38 @@ const routerUsuario = express.Router();
 
 routerUsuario.post("/register", async (req, res) => {
   try {
-    const resultado = await addUsuario(req.body);
-    res.status(200).send(resultado);
+    const result = await addUsuario(req.body);
+
+    if (result instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Usuario registrado exitosamente`,
+      result,
+    });
   } catch (error) {
-    res.status(401).send(error.message);
+    res.status(500).json(error);
   }
 });
 
 routerUsuario.post("/login", async (req, res) => {
   try {
     const usuario = await getPorCredencial(req.body.email, req.body.password);
+    if (usuario instanceof Error) {
+      return res.status(401).json({
+        success: false,
+        message: usuario.message,
+      });
+    }
     const token = await generarAuthToken(usuario);
-    res.status(200).send({ token });
+    res.status(202).json({ token });
   } catch (error) {
-    res.status(401).send({ error: error.message });
+    res.status(500).send(error);
   }
 });
 

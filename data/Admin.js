@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { ObjectId } from "mongodb";
 import getConnection from "./conn.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -11,13 +10,19 @@ export async function loginAdmin(userEmail, userPassword) {
     const usuario = { email: userEmail, password: userPassword };
     const verificarUsuario = await getUsuario(usuario);
 
+    if (verificarUsuario instanceof Error) {
+      //devuelve  un Error con mensaje explicativo
+      return verificarUsuario;
+    }
+
     if (!usuarioAdmin(verificarUsuario)) {
       return new Error("El usuario no es admin.");
     }
     const token = await generarAuthToken(verificarUsuario);
     return token;
   } catch (error) {
-    return new Error(error.message);
+    console.error("Error al loguear usuario admin: ", error);
+    throw { success: false, errorMessage: error.message };
   }
 }
 
@@ -38,22 +43,27 @@ async function getUsuario(usuario) {
     .findOne({ email: usuario.email });
 
   if (!user) {
-    throw new Error("Usuario o contraseña incorrecta.");
+    return new Error("Credenciales invalidas");
   }
 
   const isMatch = await bcryptjs.compare(usuario.password, user.password);
   if (!isMatch) {
-    throw new Error("Usuario o contraseña incorrecta.");
+    return new Error("Credenciales invalidas");
   }
 
   return user;
 }
 
 export async function generarAuthToken(usuario) {
-  const token = await jwt.sign(
-    { _id: usuario._id, email: usuario.email },
-    process.env.CLAVE_SECRETA,
-    { expiresIn: "2h" }
-  );
-  return token;
+  try {
+    const token = await jwt.sign(
+      { _id: usuario._id, email: usuario.email },
+      process.env.CLAVE_SECRETA,
+      { expiresIn: "1h" }
+    );
+    return token;
+  } catch (error) {
+    console.error("Error al crear Admin Auth Token: ", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
