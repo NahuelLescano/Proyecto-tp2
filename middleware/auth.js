@@ -7,7 +7,7 @@ async function auth(req, res, next) {
     console.log(payload);
     next();
   } catch (error) {
-    res.status(401).send(error.message);
+    res.status(401).send({ success: false, message: error.message });
   }
 }
 

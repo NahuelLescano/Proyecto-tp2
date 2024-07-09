@@ -50,11 +50,11 @@ routerUsuario.post("/verificarToken", async (req, res) => {
     const result = await verificarToken(req.body.token);
 
     if (result === "el token ha expirado") {
-      res.status(401).send({ success: false, error: "el token ha expirado" });
+      return res.status(401).send({ success: false, error: "el token ha expirado" });
     }
     res.status(200).send({ success: true, result });
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).send(error);
   }
 });
 

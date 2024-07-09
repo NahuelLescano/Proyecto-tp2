@@ -79,15 +79,20 @@ export async function generarAuthToken(usuario) {
 }
 
 export async function verificarToken(token) {
-  const result = await jwt.verify(
-    token,
-    process.env.CLAVE_SECRETA,
-    (err, res) => {
-      if (err) {
-        return "el token ha expirado";
+  try {
+    const result = await jwt.verify(
+      token,
+      process.env.CLAVE_SECRETA,
+      (err, res) => {
+        if (err) {
+          return "el token ha expirado";
+        }
+        return res;
       }
-      return res;
-    }
-  );
-  return result;
+    );
+    return result;
+  } catch (error) {
+    console.error("Error al verificar Auth Token: ", error);
+    throw { success: false, errorMessage: error.message };
+  }
 }
