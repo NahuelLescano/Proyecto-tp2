@@ -19,7 +19,7 @@ export async function loginAdmin(userEmail, userPassword) {
       return new Error("El usuario no es admin.");
     }
     const token = await generarAuthToken(verificarUsuario);
-    return token;
+    return { token, _id: verificarUsuario._id };
   } catch (error) {
     console.error("Error al loguear usuario admin: ", error);
     throw { success: false, errorMessage: error.message };
